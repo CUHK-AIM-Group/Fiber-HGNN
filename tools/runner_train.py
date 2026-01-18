@@ -83,6 +83,78 @@ class Acc_Metric:
         _dict['acc'] = self.acc
         return _dict
 
+
+def _prepare_sample_batch(train_dataloader, args, logger):
+    try:
+        _, data = next(iter(train_dataloader))
+    except StopIteration:
+        print_log('Skip resource profiling: empty training dataloader', logger=logger)
+        return None, None, None
+
+    points = data[0]
+    label = data[1]
+    fa_label = None
+
+    if args.input_format == 'subject':
+        points = points[0]
+        label = label[0]
+        fa_label = data[2]
+    if args.input_format in ['fiber_w_info', 'fibergeomap']:
+        fa_label = data[2]
+
+    points = points.cuda(non_blocking=True)
+    label = label.cuda(non_blocking=True)
+    if torch.is_tensor(fa_label):
+        fa_label = fa_label.cuda(non_blocking=True)
+
+    return points, label, fa_label
+
+
+def _log_model_resources(base_model, train_dataloader, args, logger):
+    if not torch.cuda.is_available():
+        print_log('CUDA not available, skip MACs/FLOPs/memory profiling', logger=logger)
+        return
+
+    points, label, fa_label = _prepare_sample_batch(train_dataloader, args, logger)
+    if points is None:
+        return
+
+    valid_multi_hot = getattr(train_dataloader.dataset, 'valid_multi_hot', None)
+
+    base_model.eval()
+    total_params = sum(p.numel() for p in base_model.parameters())
+    trainable_params = sum(p.numel() for p in base_model.parameters() if p.requires_grad)
+    print_log('Model params: total = {:.3f} M, trainable = {:.3f} M'.format(
+        total_params / 1e6, trainable_params / 1e6), logger=logger)
+    try:
+        from thop import profile
+        base_model.cuda()
+        with torch.no_grad():
+            macs, params = profile(base_model.module, inputs=(points, label, fa_label), verbose=False)
+        flops = macs * 2
+        print_log('Model size: MACs = {:.3f} G, FLOPs = {:.3f} G, Params = {:.3f} M'.format(
+            macs / 1e9, flops / 1e9, params / 1e6), logger=logger)
+    except Exception as e:
+        print_log('Skip MACs/FLOPs profiling (install thop?): {}'.format(e), logger=logger)
+
+    try:
+        base_model.cuda()
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.synchronize()
+        sample_logits, _ = base_model(points, label, fa_label)
+        sample_loss, *_ = base_model.module.get_loss_acc(sample_logits, label, args.use_multi_hot, valid_multi_hot)
+        sample_loss.backward()
+        torch.cuda.synchronize()
+        mem_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
+        print_log('Peak GPU memory per training step: {:.2f} MB'.format(mem_mb), logger=logger)
+    except Exception as e:
+        print_log('Skip GPU memory profiling: {}'.format(e), logger=logger)
+    finally:
+        base_model.cuda()
+        base_model.zero_grad()
+        base_model.train()
+
 def train_net(args, config, train_writer=None, val_writer=None, test_writer=None):
     args_dict = vars(args)
     logger = get_logger(args.log_name)
@@ -125,6 +197,7 @@ def train_net(args, config, train_writer=None, val_writer=None, test_writer=None
     best_emr, best_precision, best_recall, best_dice = 0.0, 0.0, 0.0, 0.0
     test_emr, test_precision, test_recall, test_dice = 0.0, 0.0, 0.0, 0.0
     base_model.zero_grad()
+    _log_model_resources(base_model, train_dataloader, args, logger)
     print('n_batches = {}'.format(len(train_dataloader)))
 
     for epoch in range(start_epoch, config.max_epoch):

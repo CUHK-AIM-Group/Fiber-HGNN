@@ -186,6 +186,7 @@ class HCP105(Dataset):
             tbar.update(1)
         tbar.close()
 
+        print('length of data_list is {}'.format(len(self.data_list)))
         pkl_name = os.path.join(self.root, '82_point_mean_{}.pkl'.format(postfix))
         with open(pkl_name, 'wb') as f:
             pickle.dump(self.point_mean, f, pickle.HIGHEST_PROTOCOL)

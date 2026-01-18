@@ -1,7 +1,7 @@
 # HGNN
 # CUDA_VISIBLE_DEVICES=0 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_1fc --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_1fc/ckpt-best.pth --fc_layer 1
 
-CUDA_VISIBLE_DEVICES=0 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_3fc_knn20 --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_3fc_dp0.5/ckpt-best.pth --fc_layer 3 --knn 20
+CUDA_VISIBLE_DEVICES=1 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_3fc_knn20 --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_3fc_dp0.5/ckpt-best.pth --fc_layer 3 --knn 20
 
 # CUDA_VISIBLE_DEVICES=2 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_knn20_pointnet --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnet_hcp105/cfgs/82fx_subject_mh_pointnet/ckpt-best.pth --knn 20
 
@@ -19,7 +19,7 @@ CUDA_VISIBLE_DEVICES=2 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 
 
 
 # HGNN + GTFA + LS
-CUDA_VISIBLE_DEVICES=3 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_3fc_knn20_dp0.5_gtfa_ls --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_3fc_dp0.5/ckpt-best.pth --use_fa --use_gtfa --use_ls --fc_layer 3 --knn 20
+CUDA_VISIBLE_DEVICES=1 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_3fc_knn20_dp0.5_gtfa_ls --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_3fc_dp0.5/ckpt-best.pth --use_fa --use_gtfa --use_ls --fc_layer 3 --knn 20
 
 
 # HGNN + GTFA + LS + select
@@ -114,7 +114,7 @@ CUDA_VISIBLE_DEVICES=6 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 
 
 
 # HGNN + DLS
-CUDA_VISIBLE_DEVICES=0 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_1fc_dls --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_1fc/ckpt-best.pth --use_ls --use_dls --fc_layer 1
+CUDA_VISIBLE_DEVICES=1 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_1fc_dls --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_1fc/ckpt-best.pth --use_ls --use_dls --fc_layer 1
 
 CUDA_VISIBLE_DEVICES=6 python main.py --config cfgs/hgnn_hcp105.yaml --exp_name 82fx_subject_mh_hgnn_3fc_knn20_dp0.5_dls --input_format subject --use_multi_hot --run_graph --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_3fc_dp0.5/ckpt-best.pth --use_ls --use_dls --fc_layer 3 --knn 20
 

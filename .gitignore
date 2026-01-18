@@ -3,8 +3,10 @@
 data/
 best/
 /.idea/
-
 dist/
 build/
 *.egg-info/
 .DS_Store
+experiments/
+data
+__pycache__/

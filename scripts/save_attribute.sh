@@ -1,5 +1,5 @@
 # 1fc
-CUDA_VISIBLE_DEVICES=2 python main.py --config cfgs/pointnets_hcp105.yaml --exp_name test_82fx_subject_mh_pointnets_1fc --input_format subject --use_multi_hot --save_attribute --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_1fc/ckpt-best.pth --fc_layer 1
+CUDA_VISIBLE_DEVICES=1 python main.py --config cfgs/pointnets_hcp105.yaml --exp_name test_82fx_subject_mh_pointnets_1fc --input_format subject --use_multi_hot --save_attribute --ckpts experiments/pointnets_hcp105/cfgs/82fx_subject_mh_pointnets_1fc/ckpt-best.pth --fc_layer 1
 
 
 # 3fc
